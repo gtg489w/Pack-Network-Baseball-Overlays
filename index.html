@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html ng-app="scoreboardApp">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Baseball/Softball Live Feed Overlay Manager</title>
+		<link rel="stylesheet" href="include/css/main.css" type="text/css" media="screen" />
+		<script type="text/javascript" src="include/js/jquery.js"></script>
+		<script type="text/javascript" src="include/js/jquery-ui.js"></script>
+		<link rel="stylesheet" href="include/css/bootstrap.css">
+		<script src="include/js/bootstrap.min.js"></script>
+		<script src="include/js/angular.js"></script>
+		<script type="text/javascript" src="include/js/main.js"></script>
+	</head>
+	<body ng-controller="ScoreboardCtrl">
+		<div id="live">
+			<div id="live_title">Live Area</div>
+			<div id="scoreboard" class="scoreboard" ng-class="{mask:!scoreboard.visible}">
+				<div class="scoreboard_title">
+					<div class="game_title"></div>
+				</div>
+			
+				<div class="scoreboard_container">
+					<!-- Team and Score containers -->
+					<div class="home_team">{{ home.team }}</div>
+					<div class="away_team">{{ away.team }}</div>
+					<div class="home_score">{{ home.runs }}</div>
+					<div class="away_score">{{ away.runs }}</div>
+					
+					<!-- Pitch Count & Outs -->
+					<div class="pitch_count" ng-if="!finished && scoreboard.count" ng-show="inning_section=='top' || inning_section=='bottom'">{{ balls }} - {{ strikes }}</div>
+					<div class="out_count" ng-if="scoreboard.outs">
+						<div ng-if="!finished">
+							<span ng-show="inning_section=='top' || inning_section=='bottom'">{{ outs }} OUT</span>
+							<span ng-show="inning_section=='middle'">MID {{inning}}</span>
+							<span ng-show="inning_section=='end'">END {{inning}}</span>
+						</div>
+						<div ng-if="finished">
+							FINAL
+						</div>
+					</div>
+				
+					<!-- Inning containers -->
+					<div id="inning_text" class="inning_text">{{inning}}</div>
+					<div class="inning top" ng-class="{active:inning_section=='top'}"></div>
+					<div class="inning bot" ng-class="{active:inning_section=='bottom'}"></div>
+					
+					<!-- Base containers -->
+					<div id="base_1" class="base" ng-class="{occupied: runners.first}"></div>
+					<div id="base_2" class="base" ng-class="{occupied: runners.second}"></div>
+					<div id="base_3" class="base" ng-class="{occupied: runners.third}"></div>
+				</div>
+			</div>
+			<div id="scoreboard_rhe" class="scoreboard" ng-class="{mask:!scoreboard_rhe.visible}">
+				<div class="scoreboard_title" style="top: 100px; font-size: 16px; text-align: center;">
+					<div ng-if="finished">
+						FINAL
+					</div>
+					<div ng-if="!finished">
+						<span ng-if="inning_section == 'top'">Top of </span>
+						<span ng-if="inning_section == 'middle'">Middle of </span>
+						<span ng-if="inning_section == 'bottom'">Bottom of </span>
+						<span ng-if="inning_section == 'end'">After </span>
+						{{ inning }}
+					</div>
+				</div>
+			
+				<div class="scoreboard_container">
+					<!-- Team and Score containers -->
+					<div class="home_team">{{ home.team }}</div>
+					<div class="away_team">{{ away.team }}</div>
+					<div class="home_score" style="left: 166px;">{{ home.runs }}</div>
+					<div class="away_score" style="left: 166px;">{{ away.runs }}</div>
+					<div class="home_score" style="left: 212px;">{{ home.hits }}</div>
+					<div class="away_score" style="left: 212px;">{{ away.hits }}</div>
+					<div class="home_score" style="left: 256px;">{{ home.errors }}</div>
+					<div class="away_score" style="left: 256px;">{{ away.errors }}</div>
+					<div class="out_count" style="left: 166px; width: 32px;">R</div>
+					<div class="out_count" style="left: 212px; width: 32px;">H</div>
+					<div class="out_count" style="left: 256px; width: 32px;">E</div>
+				</div>
+			</div>
+			
+			<div class="clear">&nbsp;</div>
+		</div>
+		<div id="controls" class="pad">
+			<div class="col-sm-8">
+				<div class="well">
+					<div style="float: left; margin: 10px;">
+						<table class="score_table">
+							<tr>
+								<th></th>
+								<td>R</td>
+								<td>H</td>
+								<td>E</td>
+							</tr>
+							<tr>
+								<td><input type="text" id="away_team_input" placeholder="Away Team" ng-model="away.team" style="width: 120px; text-align: left;" /></td>
+								<td><input type="text" id="away_runs_input" value="0" ng-model="away.runs" onclick="$(this).select()" /></td>
+								<td><input type="text" id="away_hits_input" value="0" ng-model="away.hits" onclick="$(this).select()" /></td>
+								<td><input type="text" id="away_errs_input" value="0" ng-model="away.errors" onclick="$(this).select()" /></td>
+							</tr>
+							<tr>
+								<td><input type="text" id="home_team_input" placeholder="Home Team" ng-model="home.team" style="width: 120px; text-align: left;" /></td>
+								<td><input type="text" id="home_runs_input" value="0" ng-model="home.runs" onclick="$(this).select()" /></td>
+								<td><input type="text" id="home_hits_input" value="0" ng-model="home.hits" onclick="$(this).select()" /></td>
+								<td><input type="text" id="home_errs_input" value="0" ng-model="home.errors" onclick="$(this).select()" /></td>
+							</tr>
+						</table>
+					</div>
+					<div style="float: left; margin: 10px;">
+						<table class="score_table">
+							<tr>
+								<td style="text-align: left;">
+									<div><input type="radio" name="inning_select" ng-model="inning_section" ng-change="updateInningSection()" value="top" /> Top</div>
+									<div><input type="radio" name="inning_select" ng-model="inning_section" ng-change="updateInningSection()" value="middle" /> Middle</div>
+									<div><input type="radio" name="inning_select" ng-model="inning_section" ng-change="updateInningSection()" value="bottom" /> Bottom</div>
+									<div><input type="radio" name="inning_select" ng-model="inning_section" ng-change="updateInningSection()" value="end" /> End</div>
+									<div style="text-align: center;">
+										<button class="btn btn-xs" ng-click="advanceInning()">Advance</button>
+									</div>
+								</td>
+								<td><input type="text" id="inning_text_input" ng-model="inning" onclick="$(this).select()" /></td>
+							</tr>
+						</table>
+					</div>
+					<div style="float: left; margin: 10px;">
+						<table class="score_table">
+							<tr>
+								<th>Balls</th>
+								<th>Srikes</th>
+								<th>Outs</th>
+							</tr>
+							<tr>
+								<td><input type="text" ng-disabled="inning_section=='middle' || inning_section=='end'" id="count_balls_input" ng-model="balls" onclick="$(this).select()" /></td>
+								<td><input type="text" ng-disabled="inning_section=='middle' || inning_section=='end'" id="count_strikes_input" ng-model="strikes" onclick="$(this).select()" /></td>
+								<td><input type="text" ng-disabled="inning_section=='middle' || inning_section=='end'" id="count_outs_input" ng-model="outs" onclick="$(this).select()" /></td>
+							</tr>
+							<tr>
+								<td><button class="btn btn-xs" ng-click="addBall()" ng-disabled="inning_section=='middle' || inning_section=='end'">+1</button></td>
+								<td><button class="btn btn-xs" ng-click="addStrike()" ng-disabled="inning_section=='middle' || inning_section=='end'">+1</button></td>
+								<td><button class="btn btn-xs" ng-click="addOut()" ng-disabled="inning_section=='middle' || inning_section=='end'">+1</button></td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<button class="btn btn-xs" ng-click="clearCount()" ng-disabled="inning_section=='middle' || inning_section=='end'">Clear</button>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div style="float: left; margin: 10px;">
+						<table class="score_table">
+							<tr>
+								<td>
+									Runners
+									<div id="runner_control" style="position: relative; width: 110px; height: 60px;">
+										<div class="base" style="left: 40px; top: 4px;" ng-click="runners.second = !runners.second" ng-class="{occupied:runners.second}"></div>
+										<div class="base" style="left: 20px; top: 20px;" ng-click="runners.third = !runners.third" ng-class="{occupied:runners.third}"></div>
+										<div class="base" style="left: 60px; top: 20px;" ng-click="runners.first = !runners.first" ng-class="{occupied:runners.first}"></div>
+									</div>
+									<button class="btn btn-xs" ng-click="clearRunners()">Clear</button>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="clear">&nbsp;</div>
+				</div>
+				<div class="col-sm-6">
+					<div>{{ home.team==''?'Home Team':home.team }} Lineup</div>
+					<div style="max-height: 250px; overflow-y: auto;">
+						<ol class="roster sortable">
+							<li ng-repeat="player in home.players" class="player">
+								<input type="text" class="number" ng-model="player.number" placeholder="#" />
+								<input type="text" class="position" ng-model="player.position" placeholder="Pos" />
+								<input type="text" class="name" ng-model="player.name" placeholder="Player Name" />
+								<input type="text" class="name" ng-model="player.comments" placeholder="Comments" />
+								<span class="glyphicon glyphicon-remove" ng-click="removePlayer(player)"></span>
+							</li>
+						</ol>
+					</div>
+					<div style="text-align: right;">
+						<button ng-click="addPlayer(home)" class="btn btn-sm">Add Player</button>
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<div>{{ away.team==''?'Away Team':away.team }} Lineup</div>
+					<div style="max-height: 250px; overflow-y: auto;">
+						<ol class="roster sortable">
+							<li ng-repeat="player in away.players" class="player">
+								<input type="text" class="number" ng-model="player.number" placeholder="#" />
+								<input type="text" class="position" ng-model="player.position" placeholder="Pos" />
+								<input type="text" class="name" ng-model="player.name" placeholder="Player Name" />
+								<input type="text" class="name" ng-model="player.comments" placeholder="Comments" />
+								<span class="glyphicon glyphicon-remove" ng-click="removePlayer(player)"></span>
+							</li>
+						</ol>
+					</div>
+					<div style="text-align: right;">
+						<button ng-click="addPlayer(home)" class="btn btn-sm">Add Player</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<div class="pad_small">
+					<div><input type="checkbox" checked ng-model="scoreboard.visible" /> Show Scoreboard</div>
+					<div><input type="checkbox" checked ng-model="scoreboard_rhe.visible" /> Show RHE Scoreboard</div>
+					<div><input type="checkbox" checked ng-model="scoreboard.count" /> Show Count</div>
+					<div><input type="checkbox" checked ng-model="scoreboard.outs" /> Show Outs</div>
+				</div>
+				<div class="pad_small">
+					<input type="text" placeholder="Game/Tournament Title" value="" id="game_title_input" onchange="$('.game_title').text($('#game_title_input').val()); toggleTitle();" style="width: 100%;" />
+				</div>
+				<div class="pad_small">
+					<button class="btn btn-primary" ng-click="homeRun()">Home Run</button>
+					<button class="btn btn-primary" ng-click="finishGame()">Finish Game</button>
+				</div>
+				<div class="pad_small">
+					<div>Live Keyboard <input type="text" id="liveKeyboard" ng-keypress="liveKeyboard($event);" /></div>
+					<div>Commands:</div>
+					<div style="font-size: 12px; padding-left: 40px;">
+						R = Run<br />
+						H = Hit<br />
+						E = Error<br />
+						O = Out<br />
+						B = Ball<br />
+						S = Strike<br />
+						C = Clear Count<br />
+						A = Advance Inning<br />
+						1 = Toggle 1st Base Runner<br />
+						2 = Toggle 2nd Base Runner<br />
+						3 = Toggle 3rd Base Runner<br />
+					</div>
+				</div>
+			</div>
+			
+			<!-- Action Bar -->
+			<div class="col-sm-12">
+				
+			</div>
+			
+		</div>
+	</body>
+</html>

@@ -1,0 +1,223 @@
+html, body {
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden;
+}
+
+
+
+/********************** Generics **********************/
+.pad {
+	padding: 20px;
+}
+.pad_small {
+	padding: 10px;
+}
+.clear {
+	font-size: 1px;
+	height: 1px;
+	line-height: 1px;
+	margin: 0px;
+	padding: 0px;
+	clear: both;
+}
+.mask {
+	visibility: hidden;
+}
+
+
+/********************** Live **********************/
+#live {
+	background: rgb(51, 255, 0);
+	padding: 20px;
+}
+#live_title {
+	font-family: arial, sans-serif;
+	font-weight: bold;
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	color: #fff;
+	font-size: 82px;
+	z-index: 100;
+	text-shadow: 0px 0px 26px rgba(0, 0, 0, 1);
+}
+.scoreboard {
+	float: left;
+	height: 150px;
+	width: 300px;
+	position: relative;
+	color: #fff;
+	font-family: arial, sans-serif;
+	font-size: 20px;
+	margin: 20px;
+}
+.scoreboard_container {
+	background: url(../../images/scoreboard.png) no-repeat;
+	width: 300px;
+	height: 150px;
+	z-index: 2;
+	position: absolute;
+}
+#scoreboard_rhe .scoreboard_container {
+	background: url(../../images/scoreboard_rhe.png) no-repeat;
+}
+.scoreboard_title {
+	height: 26px;
+	width: 300px;
+	position: absolute;
+	z-index: 1;
+	top: 70px;
+	left: 0px;
+	background: url(../../images/scoreboard_title.png) no-repeat;
+}
+.game_title {
+	font-size: 16px;
+	padding: 2px 0px;
+	text-align: center;
+}
+
+
+/* Team Styles */
+.away_team {
+	position: absolute;
+	top: 36px;
+	left: 10px;
+}
+.home_team {
+	position: absolute;
+	top: 64px;
+	left: 10px;
+}
+
+
+/* Score Styles */
+.away_score {
+	width: 32px;
+	text-align: center;
+	position: absolute;
+	top: 36px;
+	left: 140px;
+}
+.home_score {
+	width: 32px;
+	text-align: center;
+	position: absolute;
+	top: 64px;
+	left: 140px;
+}
+
+
+/* Pitch Count */
+.pitch_count {
+	position: absolute;
+	top: 6px;
+	left: 140px;
+	width: 64px;
+	text-align: center;
+	font-size: 16px;
+}
+.out_count {
+	position: absolute;
+	top: 6px;
+	left: 210px;
+	width: 80px;
+	text-align: center;
+	font-size: 16px;
+}
+#inning_message {
+	position: absolute;
+	top: 6px;
+	left: 210px;
+	width: 80px;
+	text-align: center;
+	font-size: 16px;
+	display: none;
+}
+
+
+/* Inning Styles */
+.inning {
+	width: 19px;
+	height: 14px;
+	position: absolute;
+}
+#inning_text {
+	position: absolute;
+	top: 48px;
+	left: 180px;
+	text-align: center;
+	width: 20px;
+}
+.inning.top {
+	background: url(../../images/inning_top_inactive.png) no-repeat;
+	top: 30px;
+	left: 180px;
+}
+.inning.bot {
+	background: url(../../images/inning_bot_inactive.png) no-repeat;
+	top: 80px;
+	left: 180px;
+}
+.inning.top.active {
+	background: url(../../images/inning_top_active.png) no-repeat;
+}
+.inning.bot.active {
+	background: url(../../images/inning_bot_active.png) no-repeat;
+}
+
+
+/* Base Styles */
+.base {
+	width: 35px;
+	height: 27px;
+	position: absolute;
+	background: url(../../images/base_empty.png) no-repeat;
+}
+#base_1 {
+	top: 50px;
+	left: 252px;
+}
+#base_2 {
+	top: 34px;
+	left: 232px;
+}
+#base_3 {
+	top: 50px;
+	left: 212px;
+}
+.base.occupied {
+	background: url(../../images/base_occupied.png) no-repeat;
+}
+
+
+
+/********************** Controls **********************/
+.score_table th, .score_table td {
+	border: 1px solid #bbb;
+	padding: 6px;
+}
+.score_table td {
+	text-align: center;
+}
+.score_table input {
+	width: 30px;
+	text-align: center;
+}
+.light_gray {
+	background: #eee;
+}
+.roster .player {
+	border: 1px solid #999;
+	background: #ddd;
+	padding: 2px;
+	border-radius: 4px;
+}
+.roster input {
+	font-size: 10px;
+	padding: 1px;
+	border: 0px;
+}
+.roster .position, .roster .number {
+	width: 30px;
+}
