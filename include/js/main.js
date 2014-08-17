@@ -165,6 +165,7 @@ scoreboardApp.controller('ScoreboardCtrl', function ($scope) {
 				} else {
 					$scope.home.errors++;
 				}
+				$scope.clearCount();
 				break;
 			case 111: // o
 			case 79: // O
